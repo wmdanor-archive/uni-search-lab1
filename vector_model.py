@@ -1,4 +1,5 @@
 import os
+import sys
 import numpy as np
 from utils import read_documents, remove_punctuation, get_most_common_word_count, read_document_formatted
 
@@ -52,13 +53,16 @@ class VectorModel:
     return read_documents(ranked_documents)
 
   def rank_documents(self, cosine_similarities: dict) -> dict:
-    return dict(sorted([(k, v) for k, v in cosine_similarities.items() if v > 0.1], key=lambda item: item[1], reverse=True))
+    for k, v in cosine_similarities.items():
+      print(k, v)
+
+    return dict(sorted([(k, v) for k, v in cosine_similarities.items() if 0.0 < v < 0.99], key=lambda item: item[1], reverse=True))
 
   def create_vector(self, data: str) -> np.ndarray:
     most_common_word_count = get_most_common_word_count(data)
 
     return np.array([
-      self.get_tf_value(data.split().count(word), most_common_word_count)*self.get_idf_value(word) for word in self.terms
+      self.get_tf_value(data.split().count(term), most_common_word_count) * self.get_idf_value(term) for term in self.terms
     ])
 
   def create_documents_vectors(self) -> dict:
@@ -73,9 +77,9 @@ class VectorModel:
   def create_terms(self) -> list[str]:
     result = list()
 
-    for doc in self.documents_locations:
-      doc_str = read_document_formatted(doc)
-      result.extend(doc_str.split())
+    for document in self.documents_locations:
+      data = read_document_formatted(document)
+      result.extend(data.split())
 
     return list(set(result))
 
@@ -91,6 +95,9 @@ class VectorModel:
 
       if term in line:
         documents_counter += 1
+
+    if N - documents_counter == 0 :
+      return -1
 
     return np.log( (N - documents_counter) / documents_counter )
 
