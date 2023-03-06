@@ -34,9 +34,11 @@ class VectorModel:
     self.document_vectors = self.create_documents_vectors()
 
   def search(self, query: str) -> dict:
-    query = remove_punctuation(query).lower()
-    query_vector = self.create_vector(query)
-    print('query_vector', query_vector)
+    query = list(set(remove_punctuation(query).lower().split()))
+    most_common_word_count = get_most_common_word_count(' '.join(query))
+    query_vector = np.array([
+      0 if not query.count(term) else self.get_tf_value(query.count(term), most_common_word_count) * self.get_idf_value(term) for term in self.terms
+    ])
     cosine_similarities = {}
 
     for document_location in self.documents_locations:
@@ -67,9 +69,10 @@ class VectorModel:
 
   def rank_documents(self, cosine_similarities: dict) -> dict:
     for k, v in cosine_similarities.items():
-      print(k, v)
+      if (v > 0.08):
+        print(k, v)
 
-    return dict(sorted([(k, v) for k, v in cosine_similarities.items() if 0.0 < v < 0.99], key=lambda item: item[1], reverse=True))
+    return dict(sorted([(k, v) for k, v in cosine_similarities.items() if v > 0.08], key=lambda item: item[1], reverse=True))
 
   def create_vector(self, data: str) -> np.ndarray:
     most_common_word_count = get_most_common_word_count(data)
