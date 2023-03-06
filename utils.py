@@ -37,3 +37,14 @@ def read_documents(documents_files_locations: set) -> dict:
     result[document_file_location] = data
 
   return result
+
+def read_documents_with_value(documents: dict) -> dict:
+  result = {}
+
+  for doc, value in documents.items():
+    with open(doc, 'r', encoding='UTF-8') as file:
+      lines = file.read()
+
+    result[doc + ' ' + str(value)] = lines
+
+  return result

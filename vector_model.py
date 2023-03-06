@@ -36,6 +36,7 @@ class VectorModel:
   def search(self, query: str) -> dict:
     query = remove_punctuation(query).lower()
     query_vector = self.create_vector(query)
+    print('query_vector', query_vector)
     cosine_similarities = {}
 
     for document_location in self.documents_locations:
@@ -47,6 +48,18 @@ class VectorModel:
         continue
 
       cosine_similarities[document_location] = np.dot(query_vector, self.document_vectors[document_location]) / euclidean_norm
+      
+      v_1 = 0
+      for i in range(len(query_vector)):
+        v_1 += query_vector[i] * self.document_vectors[document_location][i]
+      v_2 = 0
+      for i in range(len(query_vector)):
+        v_2 += query_vector[i] * query_vector[i]
+      v_3 = 0
+      for i in range(len(query_vector)):
+        v_3 += self.document_vectors[document_location][i] * self.document_vectors[document_location][i]
+      
+      cosine_similarities[document_location] = v_1 / ( np.sqrt(v_2) * np.sqrt(v_3) )
 
     ranked_documents = self.rank_documents(cosine_similarities)
 
