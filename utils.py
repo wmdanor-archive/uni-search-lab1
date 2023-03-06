@@ -9,7 +9,7 @@ def remove_punctuation(data: str) -> str:
 
 
 def read_document_formatted(document_file_location: str) -> str:
-  result = ""
+  result = ''
 
   try:
     with open(document_file_location, 'r', encoding='UTF-8') as file:
@@ -21,7 +21,7 @@ def read_document_formatted(document_file_location: str) -> str:
   return result.lower()
 
 
-def most_common_word_count(data: str) -> float:
+def get_most_common_word_count(data: str) -> int:
   _, count = Counter(data.split()).most_common(1)[0]
 
   return count
