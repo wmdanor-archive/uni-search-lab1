@@ -65,7 +65,7 @@ class VectorModel:
     result = {}
 
     for document_location in self.documents_locations:
-      document_data = read_document_formatted(doc_name=document_location)
+      document_data = read_document_formatted(document_location)
       result[document_location] = self.create_vector(document_data)
 
     return result
